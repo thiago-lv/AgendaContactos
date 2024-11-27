@@ -1,6 +1,8 @@
 ﻿// See https://aka.ms/new-console-template for more information
 using AgendaDeContactos;
 using System.Collections;
+// Tenemos que instalar la libreria MySql Data en nuget para poder utilizarlo
+using MySql.Data.MySqlClient; // Utilizamos esto para la conexion SQL
 // Agenda de Contactos
 
 //Permite al usuario agregar, buscar, editar y eliminar contactos. Si no se encuentra el usuario tirar una excepcion
@@ -150,6 +152,73 @@ while (condicionWhile == false) {
         Console.ReadKey();
         Console.Clear();
     }
+}
+// Conexion MYSQL
+// Instalamos el paquete nuget sql
+string connectionString = "Server=localhost;Database=MiBaseDeDatos;Uid=root;Pwd=1234;";
+using (MySqlConnection connection = new MySqlConnection(connectionString))
+{
+    connection.Open();
+    Console.WriteLine("Conexión exitosa a MySQL.");
+
+    // Leer el archivo SQL
+    string script = File.ReadAllText(@"C:\\Users\\Thiago\\source\\repos\\AgendaDeContactos\\MiBaseDeDatos.sql");
+    // Consultas:
+    //string query = "SELECT * FROM Usuario"; // Esta es la consulta
+
+    //using (MySqlCommand cmd = new MySqlCommand(query, connection))
+    //using (MySqlDataReader reader = cmd.ExecuteReader()) // Con esto leemos el archivo
+    ////{
+    ///while (reader.Read())
+    //{
+    //Console.WriteLine($"ID: {reader["ID"]}, Nombre: {reader["Nombre"]}, Teléfono: {reader["Telefono"]}");
+    //}
+    //}
+    // Insertar datos: 
+    //string insertQuery = "INSERT INTO Contactos (Nombre, Telefono) VALUES (@nombre, @telefono)"; // @nombre va a ser en la columna que vamos a agregar el dato 
+    //using (MySqlCommand cmd = new MySqlCommand(insertQuery, connection)) // De la clase MySqlCommand vamos a crear un objeto llamado cmd que va a tener la consulta(insertQuery) y la Conexion a la base de datos (connection)
+    //{
+    //cmd.Parameters.AddWithValue("@nombre", "Juan Pérez"); // Aca  vamos a agregar los datos a la base de datos aca la columna @nombre va a ser el dato que asignemos es decir @nombre = JUan Perez
+    //cmd.Parameters.AddWithValue("@telefono", "123456789"); 
+    //cmd.ExecuteNonQuery(); // Aca terminamos la consulta
+    //}
+
+    //Actualizar datos: 
+    //string updateQuery = "UPDATE Contactos SET Telefono = @telefono WHERE ID = @id";
+    //using (MySqlCommand cmd = new MySqlCommand(updateQuery, connection))
+    //{
+    //cmd.Parameters.AddWithValue("@telefono", "987654321"); // La tabla que vamos a modificar y el valor
+    //cmd.Parameters.AddWithValue("@id", 1); // Aca va el where con id = 1 o el que queremos modificar
+    // cmd.ExecuteNonQuery();
+    //}
+    // Eliminar un dato:
+    //string deleteQuery = "DELETE FROM Contactos WHERE ID = @id";
+
+    //using (MySqlCommand cmd = new MySqlCommand(deleteQuery, connection))
+    //{
+    //cmd.Parameters.AddWithValue("@id", 1); // Aca va el Where
+    //cmd.ExecuteNonQuery();
+    //}
+    // Crear un comando para ejecutar el script
+    MySqlCommand command = new MySqlCommand(script, connection);
+    command.ExecuteNonQuery();
+    // Vamos a darle valores a nuestra base de datos!
+    string insercionDatos = "INSERT INTO usuarios (Nombre,Edad) VALUES (@nombre,@edad)";
+    using (MySqlCommand cmd = new MySqlCommand(insercionDatos, connection)) {
+        cmd.Parameters.AddWithValue("@nombre","Thiago");
+        cmd.Parameters.AddWithValue("@edad","2341224");
+        cmd.ExecuteNonQuery (); // Terminamos la consulta
+    }
+    // Realizamos la consulta
+    string consulta = "SELECT * FROM usuarios";
+    using (MySqlCommand cmd = new MySqlCommand(consulta, connection))
+    using (MySqlDataReader reader = cmd.ExecuteReader()) {
+        while (reader.Read())
+        {
+            Console.WriteLine($"ID: {reader["ID"]}, Nombre: {reader["Nombre"]}, Teléfono: {reader["Edad"]}");
+        }
+    }
+        Console.WriteLine("Base de datos creada desde el archivo SQL.");
 }
 static Contacto DatosContacto() {
     Console.WriteLine("Inserte el numero del Contacto a Guardar:");
